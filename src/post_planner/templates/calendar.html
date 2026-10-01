@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Calendar{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+<div class="bar">
+  <div class="row">
+    <a class="button" href="/calendar?week={{ prev }}">←</a>
+    <h1>{{ days[0].strftime('%d %b') }} – {{ days[-1].strftime('%d %b %Y') }}</h1>
+    <a class="button" href="/calendar?week={{ next }}">→</a>
+    <a class="link small" href="/calendar">today</a>
+  </div>
+  <div class="row small">
+    {% if counts.pending %}<a class="badge warn" href="/posts?status=pending">{{ counts.pending }} waiting for approval</a>{% endif %}
+    {% if counts.failed + counts.unknown %}<a class="badge bad" href="/posts?status={{ 'failed' if counts.failed else 'unknown' }}">{{ counts.failed + counts.unknown }} need attention</a>{% endif %}
+    <span class="muted">time zone: {{ tzname }}</span>
+  </div>
+</div>
+<div class="week">
+  {% for day in days %}
+    {% set key = day.strftime('%Y-%m-%d') %}
+    <section class="day {{ 'today' if key == today }}">
+      <h3>{{ day.strftime('%a') }} <span>{{ day.strftime('%d/%m') }}</span></h3>
+      {% for p in by_day.get(key, []) %}
+        <a class="slot st-{{ p.status }}" href="/posts/{{ p.id }}">
+          <span class="time">{{ (p.published_at or p.publish_at)|hm }}{% if p.repeat %} ↻{% endif %}{% if p.pin %} 📌{% endif %}</span>
+          <span class="chan">{{ p.channel_title }}</span>
+          <span class="snip">{% if p.photo %}🖼 {% endif %}{{ p.text[:70] }}</span>
+          <span class="st">{{ STATUS[p.status] }}</span>
+        </a>
+      {% else %}
+        <div class="free muted small">—</div>
+      {% endfor %}
+    </section>
+  {% endfor %}
+</div>
+{% if not channels %}<div class="empty">No channels yet. An admin adds one under “Channels”.</div>{% endif %}
+{% endblock %}

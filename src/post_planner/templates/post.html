@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ ('#' ~ post.id) if post else 'New post' }}{% endblock %}
+{% block main_class %}wide{% endblock %}
+{% block content %}
+{% set live = post and post.status == 'published' %}
+<div class="bar">
+  <div>
+    <a href="/posts" class="muted">← Posts</a>
+    <h1>{{ ('Post #' ~ post.id) if post else 'New post' }}
+      {% if post %}<span class="status st-{{ post.status }}">{{ STATUS[post.status] }}</span>{% endif %}</h1>
+  </div>
+  {% if post %}<div class="muted small">by {{ post.author_name or '—' }} · {{ post.channel_title }}</div>{% endif %}
+</div>
+{% if flash %}<div class="note">{{ flash }}</div>{% endif %}
+{% if post and post.review_note and post.status == 'draft' %}<div class="note warn">↩ The editor returned it: {{ post.review_note }}</div>{% endif %}
+{% if post and post.last_error and post.status in ['failed', 'unknown', 'scheduled'] %}<div class="alert">{{ post.last_error }}</div>{% endif %}
+
+<div class="split">
+  <section>
+    {% if editable %}
+    <form method="post" action="{{ '/posts/' ~ post.id ~ '/save' if post else '/posts' }}" enctype="multipart/form-data" class="card editor" id="editor">
+      <input type="hidden" name="csrf" value="{{ csrf }}">
+      <div class="grid">
+        <label>Channel
+          <select name="channel_id" {{ 'disabled' if live }}>
+            {% for c in channels %}<option value="{{ c.id }}" {{ 'selected' if post and post.channel_id == c.id }}>{{ c.title }}</option>{% endfor %}
+          </select>
+          {% if live %}<input type="hidden" name="channel_id" value="{{ post.channel_id }}">{% endif %}
+        </label>
+        <label>Date and time <span class="muted">({{ tzname }})</span>
+          <input type="datetime-local" name="publish_at" value="{{ when_value }}" {{ 'disabled' if live }}></label>
+        <label>Repeat
+          <select name="repeat" {{ 'disabled' if live }}>
+            {% for k, v in REPEATS.items() %}<option value="{{ k }}" {{ 'selected' if post and post.repeat == k }}>{{ v }}</option>{% endfor %}
+          </select>
+        </label>
+      </div>
+      <label>Text <span class="muted small">**bold** · _italic_ · ~~strike~~ · `code` · ||spoiler|| · [text](https://link) · “&gt; ” quote</span>
+        <textarea name="text" id="text" rows="12">{{ post.text if post else '' }}</textarea>
+      </label>
+      <div class="row between small"><span class="muted" id="counter" data-limit="{{ 1024 if post and post.photo else 4096 }}"></span>
+        {% if ai_on and post and not live %}
+        <span class="row ai">AI:
+          {% for k, v in AI.items() %}<button formaction="/posts/{{ post.id }}/ai/{{ k }}" class="chip" name="ai" value="{{ k }}">{{ v }}</button>{% endfor %}
+        </span>
+        {% endif %}
+      </div>
+      <label>Buttons under the post <span class="muted small">one per line: Text | https://link</span>
+        <textarea name="buttons" rows="2">{{ post.buttons if post else '' }}</textarea></label>
+      {% if not live %}
+      <div class="row wrap">
+        <label class="file">Photo <input type="file" name="photo" accept="image/jpeg,image/png,image/webp"></label>
+        {% if post and post.photo %}<label class="check"><input type="checkbox" name="remove_photo" value="1"> remove the photo</label>{% endif %}
+        <label class="check"><input type="checkbox" name="pin" value="1" {{ 'checked' if post and post.pin }}> pin</label>
+        <label class="check"><input type="checkbox" name="silent" value="1" {{ 'checked' if post and post.silent }}> without sound</label>
+      </div>
+      {% endif %}
+      <div class="actions">
+        {% if live %}
+          <button class="primary" name="action" value="save">Update in the channel</button>
+        {% else %}
+          <button name="action" value="save">Save draft</button>
+          {% if post and post.status == 'draft' and not user.can_publish %}<button class="primary" name="action" value="submit">Send for approval</button>{% endif %}
+          {% if post and user.can_publish %}
+            <button name="action" value="publish_now" data-confirm="Publish to the channel now?">Publish now</button>
+            <button class="primary" name="action" value="approve">Approve &amp; schedule</button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </form>
+    {% if suggestion %}
+    <div class="card suggestion">
+      <div class="row between"><b>AI suggestion · {{ AI[ai_action] }}</b><button class="chip" id="use-suggestion">Use this text</button></div>
+      <pre id="suggestion">{{ suggestion }}</pre>
+      <p class="muted small">Nothing is changed until you press “Use this text” and save.</p>
+    </div>
+    {% endif %}
+    {% else %}
+      <div class="card"><p class="muted">This post is {{ STATUS[post.status]|lower }}{% if post.status in ['draft', 'pending'] %} and belongs to {{ post.author_name }}{% endif %}.</p></div>
+    {% endif %}
+
+    {% if post and user.can_publish %}
+    <div class="row wrap">
+      {% if post.status == 'pending' %}
+      <form method="post" action="/posts/{{ post.id }}/reject" class="row grow">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <input name="note" placeholder="What to change (the author sees this)" class="grow">
+        <button>Return to the author</button>
+      </form>
+      {% endif %}
+      {% for verb, label, from in [('cancel', 'Unschedule', 'scheduled'), ('retry', 'Try again now', 'failed'),
+                                   ('mark_published', 'It is in the channel: mark published', 'unknown'),
+                                   ('resend', 'It is not there: send again', 'unknown'),
+                                   ('delete', 'Delete from the channel', 'published')] if post.status == from %}
+      <form method="post" action="/posts/{{ post.id }}/{{ verb }}">
+        <input type="hidden" name="csrf" value="{{ csrf }}">
+        <button class="{{ 'danger' if verb == 'delete' }}" {% if verb == 'delete' %}data-confirm="Delete this message from the channel?"{% endif %}>{{ label }}</button>
+      </form>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="side">
+    <div class="phone">
+      <div class="phone-head">{{ post.channel_title if post else (channels[0].title if channels else 'Channel') }}<small>channel</small></div>
+      <div class="phone-body">
+        {% if post %}
+        <div class="bubble">
+          {% if post.photo %}<img src="/media/{{ post.photo }}" alt="">{% endif %}
+          <div class="msg">{{ post.text|tg|safe }}</div>
+          <div class="meta">{% if post.published_at %}{{ post.published_at|hm }}{% elif post.publish_at %}{{ post.publish_at|hm }}{% endif %}</div>
+        </div>
+        {% for line in post.buttons.splitlines() if '|' in line %}
+          <div class="tg-button">{{ line.split('|')[0].strip() }} ↗</div>
+        {% endfor %}
+        {% else %}
+        <div class="muted small center-text">Save the draft to see the preview.</div>
+        {% endif %}
+      </div>
+    </div>
+    {% if problems %}
+    <div class="card issues">{% for p in problems %}<div class="issue">⛔ {{ p }}</div>{% endfor %}</div>
+    {% endif %}
+    {% if post %}
+    <div class="card facts small">
+      <div><span class="muted">When</span> {{ (post.published_at or post.publish_at)|when }}{% if post.repeat %} · ↻ {{ REPEATS[post.repeat] }}{% endif %}</div>
+      {% if post.message_id %}<div><span class="muted">Telegram message</span> #{{ post.message_id }}</div>{% endif %}
+      {% if post.attempts %}<div><span class="muted">Attempts</span> {{ post.attempts }}</div>{% endif %}
+    </div>
+    {% endif %}
+    {% if events %}
+    <h3>History</h3>
+    <table class="history small">
+      {% for e in events[:15] %}<tr><td class="muted nowrap">{{ e.at|when }}</td><td>{{ e.user_name or 'publisher' }}</td><td><b>{{ e.action }}</b> {{ e.detail }}</td></tr>{% endfor %}
+    </table>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

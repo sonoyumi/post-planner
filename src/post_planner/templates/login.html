@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block main_class %}center{% endblock %}
+{% block content %}
+<form method="post" action="/login" class="card login">
+  <h1>🗓️ {{ team }}</h1>
+  <p class="muted">Content planner for Telegram channels</p>
+  {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <label>E-mail <input name="email" type="email" autocomplete="username" required autofocus></label>
+  <label>Password <input name="password" type="password" autocomplete="current-password" required></label>
+  <button class="primary">Log in</button>
+</form>
+{% endblock %}

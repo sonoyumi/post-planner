@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Posts{% endblock %} · {{ team }}</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+{% if user %}
+<header class="top">
+  <a class="brand" href="/calendar">🗓️ {{ team }}</a>
+  <nav>
+    <a href="/calendar" class="{{ 'on' if active == 'calendar' }}">Calendar</a>
+    <a href="/posts" class="{{ 'on' if active == 'posts' }}">Posts</a>
+    {% if user.role == 'admin' %}
+    <a href="/channels" class="{{ 'on' if active == 'channels' }}">Channels</a>
+    <a href="/users" class="{{ 'on' if active == 'users' }}">Users</a>
+    {% endif %}
+  </nav>
+  <a class="button primary" href="/posts/new">＋ New post</a>
+  <form method="post" action="/logout" class="who">
+    <span>{{ user.name }} <small class="muted">· {{ user.role }}</small></span>
+    <input type="hidden" name="csrf" value="{{ csrf }}">
+    <button class="link">Log out</button>
+  </form>
+</header>
+{% endif %}
+<main class="{% block main_class %}{% endblock %}">
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

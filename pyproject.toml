@@ -5,33 +5,51 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "post-planner"
 version = "0.1.0"
-description = "Короткое описание проекта"
+description = "Content planner for Telegram channels: drafts, approval by an editor, a calendar, scheduled publishing with retries and no double posts, repeating posts, optional AI rewriting"
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.11"
 authors = [{ name = "Vladyslav Shokun", email = "sonoyumiii@gmail.com" }]
 dependencies = [
-    # "httpx>=0.27",
+    "aiogram>=3.13,<4",
+    "aiosqlite>=0.20,<1",
+    "anthropic>=1.0,<2",
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.30,<1",
+    "jinja2>=3.1,<4",
+    "python-multipart>=0.0.9",
+    "python-dotenv>=1.0,<2",
+    "pillow>=10.4,<13",
 ]
 
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "httpx>=0.27,<1",
     "ruff>=0.6",
 ]
 
+[project.urls]
+Repository = "https://github.com/sonoyumi/post-planner"
+
 [project.scripts]
-post-planner = "post_planner.__main__:main"
+post-planner = "post_planner.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+post_planner = ["templates/*.html", "static/*"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+asyncio_mode = "auto"
 
 [tool.ruff]
-line-length = 110
+line-length = 120
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "B", "UP"]
+select = ["E", "F", "W", "I", "B", "UP", "ASYNC"]

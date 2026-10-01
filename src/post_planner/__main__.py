@@ -1,13 +1,5 @@
-"""Точка входа: `python -m post_planner` или команда `post-planner`."""
+"""`python -m post_planner` = the `post-planner` command."""
 
+from post_planner.cli import main
 
-def greet(name: str) -> str:
-    return f"Привет, {name}!"
-
-
-def main() -> None:
-    print(greet("мир"))
-
-
-if __name__ == "__main__":
-    main()
+raise SystemExit(main())

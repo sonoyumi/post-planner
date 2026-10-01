@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Channels{% endblock %}
+{% block content %}
+<h1>Channels</h1>
+{% if flash %}<div class="note">{{ flash }}</div>{% endif %}
+<table class="list">
+  <thead><tr><th>Channel</th><th>Username</th><th>Telegram id</th></tr></thead>
+  <tbody>{% for c in channels %}<tr><td><b>{{ c.title }}</b></td><td>{% if c.username %}@{{ c.username }}{% endif %}</td><td class="muted">{{ c.chat_id }}</td></tr>{% endfor %}</tbody>
+</table>
+<form method="post" action="/channels" class="card row wrap">
+  <input type="hidden" name="csrf" value="{{ csrf }}">
+  <input name="ref" placeholder="@channel_username or -100… id" required class="grow">
+  <button class="primary">Add channel</button>
+</form>
+<p class="muted small">First add the bot to the channel as an administrator with the right to post messages. The panel checks it.</p>
+{% endblock %}

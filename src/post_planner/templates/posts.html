@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Posts{% endblock %}
+{% block content %}
+<div class="bar">
+  <div class="tabs">
+    <a class="tab {{ 'on' if not status }}" href="/posts">All</a>
+    {% for s in ['draft', 'pending', 'scheduled', 'published', 'failed', 'unknown'] %}
+      <a class="tab {{ 'on' if status == s }}" href="/posts?status={{ s }}">{{ STATUS[s] }}<b>{{ counts[s] }}</b></a>
+    {% endfor %}
+  </div>
+  <a class="link small" href="/posts?mine=1">only mine</a>
+</div>
+{% if posts %}
+<table class="list">
+  <thead><tr><th>#</th><th>Post</th><th>Channel</th><th>When</th><th>Author</th><th>Status</th></tr></thead>
+  <tbody>
+  {% for p in posts %}
+    <tr>
+      <td class="muted">{{ p.id }}</td>
+      <td><a href="/posts/{{ p.id }}">{% if p.photo %}🖼 {% endif %}{{ p.text[:90] or '(photo)' }}</a>
+        {% if p.last_error and p.status in ['failed', 'unknown', 'scheduled'] %}<div class="small bad">{{ p.last_error }}</div>{% endif %}
+        {% if p.review_note and p.status == 'draft' %}<div class="small warn-text">↩ {{ p.review_note }}</div>{% endif %}</td>
+      <td>{{ p.channel_title }}</td>
+      <td class="nowrap">{{ (p.published_at or p.publish_at)|when }}{% if p.repeat %} <span class="muted">↻ {{ REPEATS[p.repeat] }}</span>{% endif %}</td>
+      <td>{{ p.author_name }}</td>
+      <td><span class="status st-{{ p.status }}">{{ STATUS[p.status] }}</span></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<div class="empty">Nothing here. <a href="/posts/new">Write a post</a>.</div>
+{% endif %}
+{% endblock %}
