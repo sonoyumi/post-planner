@@ -40,7 +40,7 @@ publisher (every 2 s): claim with a lease ─► Telegram ─► published ─�
 
 ### Features
 
-- **Writing:** simple markup — `**bold**`, `_italic_`, `~~strike~~`, `` `code` ``, `||spoiler||`, `[text](url)`, `> quote` —
+- **Writing:** simple markup — `**bold**`, `_italic_`, `~~strike~~`, `` `code` ``, `||spoiler||`, `[text](https://site.it)`, `> quote` —
   turned into Telegram HTML; everything else is escaped. A Telegram-like preview with the photo and buttons. Length is
   counted the way Telegram does (UTF-16; 4096 for a post, 1024 for a photo caption) before the post can be approved.
 - **Team and roles:** authors write and send for approval; editors approve, return with a note, schedule, publish now;
@@ -140,7 +140,7 @@ gli eventi.
 
 ### Funzionalità
 
-- **Scrittura:** formattazione semplice (`**grassetto**`, `_corsivo_`, `||spoiler||`, `[testo](url)`, `> citazione`)
+- **Scrittura:** formattazione semplice (`**grassetto**`, `_corsivo_`, `||spoiler||`, `[testo](https://sito.it)`, `> citazione`)
   trasformata in HTML di Telegram; tutto il resto è testo. Anteprima come in Telegram con foto e pulsanti; lunghezza
   contata come Telegram (4096 per un post, 1024 per la didascalia di una foto).
 - **Team e ruoli:** gli autori scrivono e inviano in approvazione; gli editor approvano, rimandano con una nota,
@@ -213,7 +213,7 @@ MIT, vedi [LICENSE](LICENSE).
 
 ### Можливості
 
-- **Написання:** проста розмітка (`**жирний**`, `_курсив_`, `||спойлер||`, `[текст](url)`, `> цитата`) перетворюється
+- **Написання:** проста розмітка (`**жирний**`, `_курсив_`, `||спойлер||`, `[текст](https://site.it)`, `> цитата`) перетворюється
   на HTML Telegram, усе інше екранується. Прев'ю як у Telegram з фото й кнопками; довжина рахується як у Telegram
   (4096 для поста, 1024 для підпису до фото).
 - **Команда й ролі:** автори пишуть і надсилають на затвердження; редактори затверджують, повертають із коментарем,
@@ -283,7 +283,7 @@ MIT, див. [LICENSE](LICENSE).
 
 ### Возможности
 
-- **Написание:** простая разметка (`**жирный**`, `_курсив_`, `||спойлер||`, `[текст](url)`, `> цитата`) превращается в
+- **Написание:** простая разметка (`**жирный**`, `_курсив_`, `||спойлер||`, `[текст](https://site.it)`, `> цитата`) превращается в
   HTML Telegram, всё остальное экранируется. Превью как в Telegram с фото и кнопками; длина считается как в Telegram
   (4096 для поста, 1024 для подписи к фото).
 - **Команда и роли:** авторы пишут и отправляют на утверждение; редакторы утверждают, возвращают с комментарием,
