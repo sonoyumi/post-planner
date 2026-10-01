@@ -43,6 +43,11 @@ def test_buttons():
                         "button line 5: links must start with https://, http://, tg:// or mailto:"]
 
 
+def test_plain_text_for_snippets():
+    plain = f.plain_text("🍝 **Il menu**\n\n_risotto_ & [prenota](https://x.it) <b>")
+    assert plain == "🍝 Il menu risotto & prenota <b>"
+
+
 def test_preview_html_shows_line_breaks_and_spoilers():
     assert f.preview_html("a\n<tg-spoiler>b</tg-spoiler>") == 'a<br><span class="spoiler">b</span>'
 
@@ -55,7 +60,8 @@ def test_local_time_and_daylight_saving():
     assert datetime.fromtimestamp(twice, ROME).utcoffset().total_seconds() == 7200
     with pytest.raises(s.BadTime, match="not a date"):
         s.parse_local("tomorrow", ROME)
-    assert s.input_value(local("2026-10-05T09:00"), ROME) == "2026-10-05T09:00"
+    assert s.input_value(local("2026-10-05T09:00"), ROME) == "05/10/2026 09:00"
+    assert s.parse_local("05/10/2026  09:00", ROME) == local("2026-10-05T09:00")
 
 
 def test_repeats_keep_the_local_time():

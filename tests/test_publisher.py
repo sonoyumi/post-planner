@@ -70,7 +70,7 @@ async def test_permanent_errors_fail_at_once(store, settings, sender):
                    TelegramBadRequest(METHOD, "Bad Request: message is too long")]
     await pub.tick()
     await pub.tick()
-    assert (await store.get(kicked)).last_error == "the bot is not an administrator of this channel any more"
+    assert (await store.get(kicked)).last_error.startswith("the bot is not an administrator of this channel any more")
     assert (await store.get(too_long)).last_error == "Telegram refused: Bad Request: message is too long"
     assert {(await store.get(i)).status for i in (kicked, too_long)} == {"failed"}
 

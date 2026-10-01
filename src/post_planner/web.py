@@ -99,7 +99,8 @@ def create_app(store: Store, settings: Settings, sender: Sender | None = None, r
     templates.env.filters.update(
         when=lambda ts: schedule.to_local(ts, tz).strftime("%a %d/%m %H:%M") if ts else "—",
         hm=lambda ts: schedule.to_local(ts, tz).strftime("%H:%M") if ts else "",
-        tg=lambda text: formatting.preview_html(formatting.to_telegram_html(text)))
+        tg=lambda text: formatting.preview_html(formatting.to_telegram_html(text)),
+        plain=formatting.plain_text)
     limiter = LoginLimiter(clock)
 
     @app.middleware("http")

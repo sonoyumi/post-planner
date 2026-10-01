@@ -28,7 +28,7 @@
           {% if live %}<input type="hidden" name="channel_id" value="{{ post.channel_id }}">{% endif %}
         </label>
         <label>Date and time <span class="muted">({{ tzname }})</span>
-          <input type="datetime-local" name="publish_at" value="{{ when_value }}" {{ 'disabled' if live }}></label>
+          <input name="publish_at" value="{{ when_value }}" placeholder="05/10/2026 09:00" autocomplete="off" {{ 'disabled' if live }}></label>
         <label>Repeat
           <select name="repeat" {{ 'disabled' if live }}>
             {% for k, v in REPEATS.items() %}<option value="{{ k }}" {{ 'selected' if post and post.repeat == k }}>{{ v }}</option>{% endfor %}
@@ -36,7 +36,7 @@
         </label>
       </div>
       <label>Text <span class="muted small">**bold** · _italic_ · ~~strike~~ · `code` · ||spoiler|| · [text](https://link) · “&gt; ” quote</span>
-        <textarea name="text" id="text" rows="12">{{ post.text if post else '' }}</textarea>
+        <textarea name="text" id="text" rows="8">{{ post.text if post else '' }}</textarea>
       </label>
       <div class="row between small"><span class="muted" id="counter" data-limit="{{ 1024 if post and post.photo else 4096 }}"></span>
         {% if ai_on and post and not live %}

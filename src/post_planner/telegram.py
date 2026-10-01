@@ -28,6 +28,8 @@ from aiogram.types import FSInputFile, InlineKeyboardButton, InlineKeyboardMarku
 
 from .formatting import Button
 
+KICKED = "the bot is not an administrator of this channel any more: add it back, then “Try again now”"
+
 
 @dataclass(frozen=True)
 class Outcome:
@@ -43,7 +45,7 @@ def classify(exc: Exception) -> Outcome:
     if isinstance(exc, TelegramUnauthorizedError):
         return Outcome(None, "the bot token is invalid or was revoked (BOT_TOKEN)")
     if isinstance(exc, TelegramForbiddenError):
-        return Outcome(None, "the bot is not an administrator of this channel any more")
+        return Outcome(None, KICKED)
     if isinstance(exc, TelegramNotFound | TelegramBadRequest):
         return Outcome(None, f"Telegram refused: {exc.message}")
     if isinstance(exc, TelegramAPIError):

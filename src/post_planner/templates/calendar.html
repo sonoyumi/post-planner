@@ -24,7 +24,7 @@
         <a class="slot st-{{ p.status }}" href="/posts/{{ p.id }}">
           <span class="time">{{ (p.published_at or p.publish_at)|hm }}{% if p.repeat %} ↻{% endif %}{% if p.pin %} 📌{% endif %}</span>
           <span class="chan">{{ p.channel_title }}</span>
-          <span class="snip">{% if p.photo %}🖼 {% endif %}{{ p.text[:70] }}</span>
+          <span class="snip">{% if p.photo %}🖼 {% endif %}{{ p.text|plain|truncate(80) }}</span>
           <span class="st">{{ STATUS[p.status] }}</span>
         </a>
       {% else %}

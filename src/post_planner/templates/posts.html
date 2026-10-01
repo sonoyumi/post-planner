@@ -17,7 +17,7 @@
   {% for p in posts %}
     <tr>
       <td class="muted">{{ p.id }}</td>
-      <td><a href="/posts/{{ p.id }}">{% if p.photo %}🖼 {% endif %}{{ p.text[:90] or '(photo)' }}</a>
+      <td><a href="/posts/{{ p.id }}">{% if p.photo %}🖼 {% endif %}{{ (p.text|plain|truncate(100)) or '(photo)' }}</a>
         {% if p.last_error and p.status in ['failed', 'unknown', 'scheduled'] %}<div class="small bad">{{ p.last_error }}</div>{% endif %}
         {% if p.review_note and p.status == 'draft' %}<div class="small warn-text">↩ {{ p.review_note }}</div>{% endif %}</td>
       <td>{{ p.channel_title }}</td>

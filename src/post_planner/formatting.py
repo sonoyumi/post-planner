@@ -84,6 +84,11 @@ def visible_length(telegram_html: str) -> int:
     return len(plain.encode("utf-16-le")) // 2
 
 
+def plain_text(source: str) -> str:
+    """The post as a reader sees it, without markup — for one-line snippets in lists and the calendar."""
+    return " ".join(html.unescape(_TAG.sub("", to_telegram_html(source))).split())
+
+
 def preview_html(telegram_html: str) -> str:
     """The same HTML for the panel: line breaks shown, spoilers styled. Built only from escaped input + our tags."""
     return (telegram_html.replace("<tg-spoiler>", '<span class="spoiler">').replace("</tg-spoiler>", "</span>")

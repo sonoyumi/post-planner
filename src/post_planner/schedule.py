@@ -20,11 +20,12 @@ class BadTime(ValueError):
 
 
 def parse_local(value: str, tz: ZoneInfo) -> float:
-    """'2026-10-05T09:00' (an <input type=datetime-local>) in the team's time zone -> UTC timestamp."""
+    """'05/10/2026 09:00' (as typed in the panel) or '2026-10-05T09:00' in the team's time zone -> UTC timestamp."""
+    text = " ".join(value.strip().split())
     try:
-        naive = datetime.fromisoformat(value.strip())
+        naive = datetime.strptime(text, "%d/%m/%Y %H:%M") if "/" in text else datetime.fromisoformat(text)
     except ValueError:
-        raise BadTime(f"{value!r} is not a date and time") from None
+        raise BadTime(f"{value!r} is not a date and time (write it as 05/10/2026 09:00)") from None
     if naive.tzinfo is not None:
         naive = naive.replace(tzinfo=None)
     local = naive.replace(tzinfo=tz, fold=0)
@@ -39,8 +40,9 @@ def to_local(ts: float, tz: ZoneInfo) -> datetime:
 
 
 def input_value(ts: float | None, tz: ZoneInfo) -> str:
-    """UTC timestamp -> value for <input type=datetime-local>."""
-    return to_local(ts, tz).strftime("%Y-%m-%dT%H:%M") if ts else ""
+    """UTC timestamp -> the date field of the panel, the European way (the browser's own date widget follows the
+    computer's locale and would show 10/03/2026 05:30 PM on an English system)."""
+    return to_local(ts, tz).strftime("%d/%m/%Y %H:%M") if ts else ""
 
 
 def next_time(ts: float, repeat: str, tz: ZoneInfo) -> float | None:
